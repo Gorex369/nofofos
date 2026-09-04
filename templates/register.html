@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Register | Academic Tracker{% endblock %}
+{% block content %}
+<div class="auth-card mx-auto">
+    <h1 class="h3 mb-1">Create your account</h1>
+    <p class="text-secondary mb-4">Start tracking your academic progress.</p>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label" for="full_name">Full name</label>
+            <input class="form-control" id="full_name" name="full_name" type="text" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="student_id">Student ID</label>
+            <input class="form-control" id="student_id" name="student_id" type="text" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="email">Email address</label>
+            <input class="form-control" id="email" name="email" type="email" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" id="password" name="password" type="password" minlength="6" required>
+        </div>
+        <button class="btn btn-primary w-100" type="submit">Register</button>
+    </form>
+    <p class="text-center text-secondary mt-4 mb-0">Already registered? <a href="{{ url_for('login') }}">Log in</a></p>
+</div>
+{% endblock %}

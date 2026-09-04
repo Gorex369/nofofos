@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ activity.title }} | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="text-primary fw-semibold mb-1">Activity details</p><h1 class="h2 mb-1">{{ activity.title }}</h1><p class="text-secondary mb-0">{{ activity.activity_category }} activity</p></div><div class="d-flex gap-2"><a class="btn btn-outline-primary" href="{{ url_for('edit_activity', activity_id=activity.id) }}">Edit</a><a class="btn btn-outline-secondary" href="{{ url_for('activities') }}">Back to activities</a></div></div>
+<section class="panel detail-panel">
+    <div class="row g-4">
+        <div class="col-md-6"><dl class="row mb-0"><dt class="col-sm-5">Category</dt><dd class="col-sm-7">{{ activity.activity_category }}</dd><dt class="col-sm-5">Activity type</dt><dd class="col-sm-7">{{ activity.activity_type }}</dd><dt class="col-sm-5">Date</dt><dd class="col-sm-7">{{ activity.activity_date.strftime('%d %b %Y') }}</dd><dt class="col-sm-5">Subject</dt><dd class="col-sm-7">{{ activity.subject.code ~ ' - ' ~ activity.subject.name if activity.subject else 'Not associated' }}</dd></dl></div>
+        <div class="col-md-6"><dl class="row mb-0"><dt class="col-sm-5">Verification</dt><dd class="col-sm-7"><span class="activity-status status-{{ activity.verification_status|lower }}">{{ activity.verification_status }}</span></dd><dt class="col-sm-5">Organizer</dt><dd class="col-sm-7">{{ activity.organizer or '-' }}</dd><dt class="col-sm-5">Location</dt><dd class="col-sm-7">{{ activity.location or '-' }}</dd><dt class="col-sm-5">Created</dt><dd class="col-sm-7">{{ activity.created_at.strftime('%d %b %Y, %H:%M') }}</dd></dl></div>
+    </div>
+    <hr>
+    <h2 class="h5">Description</h2>
+    <p class="mb-0 activity-description">{{ activity.description }}</p>
+    <hr>
+    <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 mb-0">Evidence</h2><a class="btn btn-sm btn-outline-primary" href="{{ url_for('add_activity_evidence', activity_id=activity.id) }}">Attach evidence</a></div>
+    {% if activity.evidence_attachments %}
+        <div class="list-group">{% for evidence in activity.evidence_attachments %}<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="{{ url_for('activity_evidence_detail', activity_id=activity.id, evidence_id=evidence.id) }}"><span>{{ evidence.original_filename }} <small class="text-secondary">({{ '%.2f'|format(evidence.file_size / 1024) }} KB)</small></span><span class="activity-status status-pending">{{ evidence.verification_status }}</span></a>{% endfor %}</div>
+    {% else %}<p class="text-secondary mb-0">No evidence attached yet.</p>{% endif %}
+    <div class="border-top mt-4 pt-4"><form method="post" action="{{ url_for('delete_activity', activity_id=activity.id) }}" onsubmit="return confirm('Delete this activity?');"><button class="btn btn-outline-danger" type="submit">Delete activity</button></form></div>
+</section>
+{% endblock %}

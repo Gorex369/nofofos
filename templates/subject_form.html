@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if subject else 'Add' }} Subject | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="text-primary fw-semibold mb-1">Subject management</p>
+        <h1 class="h2 mb-1">{{ 'Edit subject' if subject else 'Add subject' }}</h1>
+        <p class="text-secondary mb-0">Enter the details for one of your subjects.</p>
+    </div>
+</div>
+<section class="panel form-panel">
+    <form method="post">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label" for="name">Subject name <span class="text-danger">*</span></label>
+                <input class="form-control" id="name" name="name" value="{{ subject.name if subject else '' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="code">Subject code <span class="text-danger">*</span></label>
+                <input class="form-control" id="code" name="code" value="{{ subject.code if subject else '' }}" required>
+            </div>
+            <div class="col-md-8">
+                <label class="form-label" for="faculty_name">Faculty name</label>
+                <input class="form-control" id="faculty_name" name="faculty_name" value="{{ subject.faculty_name if subject else '' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="credits">Credits</label>
+                <input class="form-control" id="credits" name="credits" type="number" min="0" step="1" value="{{ subject.credits if subject and subject.credits is not none else '' }}">
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">{{ 'Save changes' if subject else 'Add subject' }}</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('subjects') }}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

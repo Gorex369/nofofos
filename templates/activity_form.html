@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if activity else 'Add' }} Activity | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="text-primary fw-semibold mb-1">Academic records</p><h1 class="h2 mb-1">{{ 'Edit activity' if activity else 'Add activity' }}</h1><p class="text-secondary mb-0">Record facts about an academic or extra-curricular activity.</p></div></div>
+{% if form_error %}<div class="alert alert-danger" role="alert">{{ form_error }}</div>{% endif %}
+<section class="panel form-panel">
+    <form method="post">
+        <div class="row g-3">
+            <div class="col-md-8"><label class="form-label" for="title">Title <span class="text-danger">*</span></label><input class="form-control" id="title" name="title" maxlength="120" value="{{ form_data.get('title', activity.title if activity else '') }}" required></div>
+            <div class="col-md-4"><label class="form-label" for="activity_date">Date <span class="text-danger">*</span></label><input class="form-control" id="activity_date" name="activity_date" type="date" value="{{ form_data.get('activity_date', activity.activity_date.isoformat() if activity else today) }}" required></div>
+            <div class="col-md-6"><label class="form-label" for="activity_category">Category <span class="text-danger">*</span></label><select class="form-select" id="activity_category" name="activity_category" required><option value="">Choose a category</option>{% for category in categories %}<option value="{{ category }}" {% if form_data.get('activity_category', activity.activity_category if activity else '') == category %}selected{% endif %}>{{ category }}</option>{% endfor %}</select></div>
+            <div class="col-md-6"><label class="form-label" for="activity_type">Activity type <span class="text-danger">*</span></label><select class="form-select" id="activity_type" name="activity_type" required><option value="">Choose a type</option>{% for activity_type in activity_types %}<option value="{{ activity_type }}" {% if form_data.get('activity_type', activity.activity_type if activity else '') == activity_type %}selected{% endif %}>{{ activity_type }}</option>{% endfor %}</select></div>
+            <div class="col-md-12"><label class="form-label" for="subject_id">Subject (optional)</label><select class="form-select" id="subject_id" name="subject_id"><option value="">Not associated with a subject</option>{% for subject in subjects %}<option value="{{ subject.id }}" {% if form_data.get('subject_id', activity.subject_id if activity and activity.subject_id else '')|string == subject.id|string %}selected{% endif %}>{{ subject.code }} - {{ subject.name }}</option>{% endfor %}</select></div>
+            <div class="col-12"><label class="form-label" for="description">Description <span class="text-danger">*</span></label><textarea class="form-control" id="description" name="description" maxlength="1000" rows="4" required>{{ form_data.get('description', activity.description if activity else '') }}</textarea><div class="form-text">Activities remain separate from ordinary class attendance.</div></div>
+            <div class="col-md-6"><label class="form-label" for="organizer">Organizer</label><input class="form-control" id="organizer" name="organizer" maxlength="120" value="{{ form_data.get('organizer', activity.organizer if activity else '') }}"></div>
+            <div class="col-md-6"><label class="form-label" for="location">Location</label><input class="form-control" id="location" name="location" maxlength="120" value="{{ form_data.get('location', activity.location if activity else '') }}"></div>
+        </div>
+        <div class="alert alert-light border mt-4 mb-0">Verification status: <strong>{{ activity.verification_status if activity else 'Pending' }}</strong>. Students cannot change this status through this form.</div>
+        <div class="d-flex gap-2 mt-4"><button class="btn btn-primary" type="submit">{{ 'Save changes' if activity else 'Add activity' }}</button><a class="btn btn-outline-secondary" href="{{ url_for('activities') }}">Cancel</a></div>
+    </form>
+</section>
+{% endblock %}

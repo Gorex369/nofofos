@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Assessments | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="text-primary fw-semibold mb-1">Academic records</p>
+        <h1 class="h2 mb-1">Assessment tracking</h1>
+        <p class="text-secondary mb-0">Record marks from your academic assessments. Performance is calculated automatically.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('add_assessment') }}">Add assessment</a>
+</div>
+
+{% if form_error %}<div class="alert alert-danger" role="alert">{{ form_error }}</div>{% endif %}
+{% if not subjects %}
+    <section class="panel empty-state">
+        <h2 class="h5">Add a subject first</h2>
+        <p class="text-secondary mb-3">Assessments must belong to one of your subjects.</p>
+        <a class="btn btn-primary" href="{{ url_for('add_subject') }}">Add subject</a>
+    </section>
+{% else %}
+    <section class="panel mb-4">
+        <form method="get" class="row align-items-end g-3">
+            <div class="col-md-8">
+                <label class="form-label" for="subject_id">Filter by subject</label>
+                <select class="form-select" id="subject_id" name="subject_id" onchange="this.form.submit()">
+                    <option value="">All subjects</option>
+                    {% for subject in subjects %}<option value="{{ subject.id }}" {% if selected_subject and subject.id == selected_subject.id %}selected{% endif %}>{{ subject.code }} - {{ subject.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4"><noscript><button class="btn btn-outline-primary" type="submit">Apply filter</button></noscript></div>
+        </form>
+    </section>
+
+    {% if overall.count %}
+        <div class="row g-3 mb-4">
+            <div class="col-sm-4"><div class="summary-card"><span>Assessments</span><strong>{{ overall.count }}</strong></div></div>
+            <div class="col-sm-4"><div class="summary-card"><span>Marks obtained</span><strong>{{ '%.2f'|format(overall.marks_obtained) }}</strong></div></div>
+            <div class="col-sm-4"><div class="summary-card"><span>Overall performance</span><strong>{{ '%.2f'|format(overall.percentage) }}%</strong></div></div>
+        </div>
+    {% endif %}
+
+    <section class="panel mb-4">
+        <h2 class="h5 mb-3">{% if selected_subject %}Assessments for {{ selected_subject.name }}{% else %}All assessments{% endif %}</h2>
+        {% if records %}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0"><thead><tr><th>Date</th><th>Subject</th><th>Type</th><th>Title</th><th>Performance</th><th>Remarks</th><th>Evidence</th><th>Reviews</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>{% for record in records %}<tr><td>{{ record.assessment_date.strftime('%d %b %Y') }}</td><td>{{ record.subject.name }}</td><td>{{ record.assessment_type }}</td><td class="fw-semibold">{{ record.assessment_title or '-' }}</td><td>{{ '%.2f'|format(record.marks_obtained) }} / {{ '%.2f'|format(record.maximum_marks) }}<br><span class="text-secondary small">{{ '%.2f'|format((record.marks_obtained / record.maximum_marks) * 100) }}%</span></td><td>{{ record.remarks or '-' }}</td><td><a href="{{ url_for('add_assessment_evidence', assessment_id=record.id) }}">{{ record.evidence_attachments|length }} attached</a>{% for evidence in record.evidence_attachments %}<br><a class="small" href="{{ url_for('assessment_evidence_detail', assessment_id=record.id, evidence_id=evidence.id) }}">{{ evidence.original_filename }}</a>{% endfor %}</td><td>{% for review in record.academic_reviews %}<a class="review-status review-{{ review.review_status|lower|replace(' ', '-') }}" href="{{ url_for('review_detail', review_id=review.id) }}">{{ review.review_status }}</a><br>{% else %}<span class="text-secondary">None</span>{% endfor %}<a class="small" href="{{ url_for('create_assessment_review', assessment_id=record.id) }}">Add review</a></td><td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('edit_assessment', assessment_id=record.id) }}">Edit</a> <form class="d-inline" method="post" action="{{ url_for('delete_assessment', assessment_id=record.id) }}" onsubmit="return confirm('Delete this assessment?');"><button class="btn btn-sm btn-outline-danger" type="submit">Delete</button></form></td></tr>{% endfor %}</tbody></table>
+            </div>
+        {% else %}
+            <p class="text-secondary mb-0">No assessment data has been entered yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2 class="h5 mb-3">Subject-wise performance</h2>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0"><thead><tr><th>Subject</th><th>Assessments</th><th>Marks Obtained</th><th>Maximum Marks</th><th>Performance %</th></tr></thead>
+            <tbody>{% for item in summaries %}<tr><td>{{ item.subject.name }}</td><td>{{ item.summary.count }}</td><td>{{ '%.2f'|format(item.summary.marks_obtained) }}</td><td>{{ '%.2f'|format(item.summary.maximum_marks) }}</td><td>{% if item.summary.percentage is not none %}<span class="attendance-status {{ 'status-good' if item.summary.percentage >= 75 else 'status-low' }}">{{ '%.2f'|format(item.summary.percentage) }}%</span>{% else %}<span class="text-secondary">No assessments</span>{% endif %}</td></tr>{% endfor %}</tbody></table>
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

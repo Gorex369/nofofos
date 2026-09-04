@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if review else 'Add' }} Review | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="text-primary fw-semibold mb-1">Assessment review</p><h1 class="h2 mb-1">{{ 'Edit review' if review else 'Record review' }}</h1><p class="text-secondary mb-0">Compare marks factually without changing the original assessment.</p></div></div>
+{% if form_error %}<div class="alert alert-danger" role="alert">{{ form_error }}</div>{% endif %}
+<section class="panel form-panel">
+    <div class="alert alert-light border"><strong>{{ assessment.assessment_title or assessment.assessment_type }}</strong><br>Original assessment marks: <strong>{{ '%.2f'|format(assessment.marks_obtained) }} / {{ '%.2f'|format(assessment.maximum_marks) }}</strong><br><small class="text-secondary">The recorded value is preserved in this review and the Assessment record will not be changed.</small></div>
+    <form method="post">
+        <div class="mb-3"><label class="form-label" for="reviewed_marks_obtained">Reviewed / compared marks</label><input class="form-control" id="reviewed_marks_obtained" name="reviewed_marks_obtained" type="number" min="0" max="{{ assessment.maximum_marks }}" step="0.01" value="{{ review.reviewed_marks_obtained if review else '' }}" required><div class="form-text">Enter a value from 0 to {{ '%.2f'|format(assessment.maximum_marks) }}.</div></div>
+        <div class="mb-3"><label class="form-label" for="review_note">Review note{% if not review %} (required when a difference is found){% endif %}</label><textarea class="form-control" id="review_note" name="review_note" maxlength="1000" rows="4">{{ review.review_note if review else '' }}</textarea></div>
+        <div class="alert alert-light border">Review status is calculated from the difference. It cannot be manually selected.</div>
+        <div class="d-flex gap-2"><button class="btn btn-primary" type="submit">{{ 'Save changes' if review else 'Record review' }}</button><a class="btn btn-outline-secondary" href="{{ url_for('review_detail', review_id=review.id) if review else url_for('assessments') }}">Cancel</a></div>
+    </form>
+</section>
+{% endblock %}

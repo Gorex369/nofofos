@@ -1,0 +1,149 @@
+body {
+    background: #f4f7fb;
+}
+
+.auth-card {
+    max-width: 440px;
+    margin-top: 3rem;
+    padding: 2rem;
+    background: #ffffff;
+    border: 1px solid #e1e8f0;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(31, 52, 73, 0.08);
+}
+
+.summary-card,
+.panel {
+    padding: 1.25rem;
+    background: #ffffff;
+    border: 1px solid #e1e8f0;
+    border-radius: 0.5rem;
+}
+
+.summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.summary-card span {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.summary-card strong {
+    color: #0d6efd;
+    font-size: 1.75rem;
+}
+
+.attendance-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-good {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #146c43;
+    background: #d1e7dd;
+}
+
+.status-low {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #842029;
+    background: #f8d7da;
+}
+
+.status-neutral {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    color: #495057;
+    background: #e9ecef;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.activity-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-pending {
+    color: #664d03;
+    background: #fff3cd;
+}
+
+.status-verified {
+    color: #146c43;
+    background: #d1e7dd;
+}
+
+.status-rejected {
+    color: #842029;
+    background: #f8d7da;
+}
+
+.page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-panel,
+.form-panel,
+.detail-panel {
+    max-width: 820px;
+}
+
+.activity-description {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.review-status {
+    display: inline-block;
+    margin-bottom: 0.25rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.review-no-difference {
+    color: #146c43;
+    background: #d1e7dd;
+}
+
+.review-difference-found,
+.review-needs-review {
+    color: #664d03;
+    background: #fff3cd;
+}
+
+.empty-state {
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+@media (max-width: 576px) {
+    .page-heading {
+        flex-direction: column;
+    }
+}

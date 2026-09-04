@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Academic Tracker{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <p class="text-primary fw-semibold mb-1">Student dashboard</p>
+        <h1 class="h2 mb-1">Hello, {{ user.full_name }}</h1>
+        <p class="text-secondary mb-0">Student ID: {{ user.student_id }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" href="{{ url_for('profile') }}">Edit profile</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('attendance') }}">Attendance</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('assessments') }}">Assessments</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('reviews') }}">Reviews</a>
+        <a class="btn btn-primary" href="{{ url_for('add_subject') }}">Add subject</a>
+    </div>
+</div>
+<section class="panel mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3"><div><h2 class="h5 mb-1">Today's schedule</h2><p class="text-secondary small mb-0">{{ today_name }} from the published official timetable.</p></div><a href="{{ url_for('student_timetable') }}">Weekly timetable</a></div>
+    {% if today_entries %}<div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Time</th><th>Subject</th><th>Room / lab</th><th>Faculty / mentor</th><th>Batch / group</th><th>Status</th></tr></thead><tbody>{% for entry in today_entries %}<tr><td>{{ entry.start_time }} - {{ entry.end_time }}</td><td class="fw-semibold">{{ entry.subject_name }}</td><td>{{ entry.room_lab or '-' }}</td><td>{{ entry.faculty_name or '-' }}</td><td>{{ entry.batch_group or '-' }}</td><td>{% if current_time < entry.start_time %}<span class="status-neutral">Upcoming</span>{% elif current_time >= entry.end_time %}<span class="status-neutral">Completed</span>{% else %}<span class="status-good">Current</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="text-secondary mb-0">No official timetable is currently available for your academic details.</p>{% endif %}
+</section>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3"><div class="summary-card"><span>Total subjects</span><strong>{{ subjects|length }}</strong></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="summary-card"><span>Overall attendance</span><strong>{% if overall_attendance.percentage is not none %}{{ '%.2f'|format(overall_attendance.percentage) }}%{% else %}<small class="text-secondary">No Data</small>{% endif %}</strong></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="summary-card"><span>Assessments recorded</span><strong>{{ overall_assessment.count }}</strong></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="summary-card"><span>Assessment performance</span><strong>{% if overall_assessment.percentage is not none %}{{ '%.2f'|format(overall_assessment.percentage) }}%{% else %}<small class="text-secondary">No Data</small>{% endif %}</strong></div></div>
+</div>
+<section class="panel mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div><h2 class="h5 mb-1">Recent activities</h2><p class="text-secondary small mb-0">{{ activity_count }} recorded academic or extra-curricular activit{{ 'y' if activity_count == 1 else 'ies' }}.</p></div>
+        <a href="{{ url_for('activities') }}">View activities</a>
+    </div>
+    {% if recent_activities %}
+        <div class="table-responsive">
+            <table class="table align-middle mb-0"><thead><tr><th>Date</th><th>Activity</th><th>Category</th><th>Status</th></tr></thead>
+            <tbody>{% for activity in recent_activities %}<tr><td>{{ activity.activity_date.strftime('%d %b %Y') }}</td><td><a class="fw-semibold" href="{{ url_for('activity_detail', activity_id=activity.id) }}">{{ activity.title }}</a></td><td>{{ activity.activity_category }}</td><td><span class="activity-status status-{{ activity.verification_status|lower }}">{{ activity.verification_status }}</span></td></tr>{% endfor %}</tbody></table>
+        </div>
+    {% else %}
+        <p class="text-secondary mb-0">No activities have been recorded yet.</p>
+    {% endif %}
+</section>
+<section class="panel">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div><h2 class="h5 mb-1">Academic overview</h2><p class="text-secondary small mb-0">Subject-level progress from your recorded data.</p></div>
+        <a href="{{ url_for('subjects') }}">Manage subjects</a>
+    </div>
+    {% if academic_overview %}
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th>Subject</th><th>Attendance</th><th>Assessment performance</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for item in academic_overview %}
+                    <tr>
+                        <td><div class="fw-semibold">{{ item.subject.name }}</div><span class="text-secondary small">{{ item.subject.code }}</span></td>
+                        <td>
+                            {% if item.attendance.percentage is not none %}
+                                <div class="d-flex justify-content-between small"><span>{{ item.attendance.attended }} / {{ item.attendance.total }} classes</span><span>{{ '%.2f'|format(item.attendance.percentage) }}%</span></div>
+                                <div class="progress" role="progressbar" aria-label="{{ item.subject.name }} attendance" aria-valuenow="{{ item.attendance.percentage }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-primary dashboard-progress" data-progress="{{ item.attendance.percentage }}"></div></div>
+                            {% else %}<span class="text-secondary">No Data</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if item.assessment.percentage is not none %}
+                                <div class="d-flex justify-content-between small"><span>{{ '%.2f'|format(item.assessment.marks_obtained) }} / {{ '%.2f'|format(item.assessment.maximum_marks) }}</span><span>{{ '%.2f'|format(item.assessment.percentage) }}%</span></div>
+                                <div class="progress" role="progressbar" aria-label="{{ item.subject.name }} assessment performance" aria-valuenow="{{ item.assessment.percentage }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-success dashboard-progress" data-progress="{{ item.assessment.percentage }}"></div></div>
+                            {% else %}<span class="text-secondary">No Data</span>{% endif %}
+                        </td>
+                        <td class="text-nowrap">
+                            {% if item.attendance.percentage is none and item.assessment.percentage is none %}
+                                <span class="status-neutral">No Data</span>
+                            {% elif (item.attendance.percentage is not none and item.attendance.percentage < status_threshold) or (item.assessment.percentage is not none and item.assessment.percentage < status_threshold) %}
+                                <span class="status-low">Needs Attention</span>
+                            {% else %}
+                                <span class="status-good">Good</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-secondary mb-0">No subjects have been added yet.</p>
+    {% endif %}
+</section>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

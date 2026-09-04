@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Attendance | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="text-primary fw-semibold mb-1">Academic records</p>
+        <h1 class="h2 mb-1">Attendance tracking</h1>
+        <p class="text-secondary mb-0">Record each class as Present or Absent. Percentages are calculated automatically.</p>
+    </div>
+</div>
+
+{% if form_error %}
+    <div class="alert alert-danger" role="alert">{{ form_error }}</div>
+{% endif %}
+{% if not subjects %}
+    <section class="panel empty-state">
+        <h2 class="h5">Add a subject first</h2>
+        <p class="text-secondary mb-3">Attendance records must belong to one of your subjects.</p>
+        <a class="btn btn-primary" href="{{ url_for('add_subject') }}">Add subject</a>
+    </section>
+{% else %}
+    <section class="panel mb-4">
+        <form method="get" class="row align-items-end g-3">
+            <div class="col-md-8">
+                <label class="form-label" for="subject_id">Select subject</label>
+                <select class="form-select" id="subject_id" name="subject_id" onchange="this.form.submit()" required>
+                    <option value="">Choose a subject</option>
+                    {% for subject in subjects %}
+                        <option value="{{ subject.id }}" {% if selected_subject and subject.id == selected_subject.id %}selected{% endif %}>{{ subject.code }} - {{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <noscript><button class="btn btn-outline-primary" type="submit">View attendance</button></noscript>
+            </div>
+        </form>
+    </section>
+
+    {% if selected_subject %}
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3"><div class="summary-card"><span>Total Classes</span><strong>{{ summary.total }}</strong></div></div>
+            <div class="col-sm-6 col-lg-3"><div class="summary-card"><span>Classes Attended</span><strong>{{ summary.attended }}</strong></div></div>
+            <div class="col-sm-6 col-lg-3"><div class="summary-card"><span>Classes Missed</span><strong>{{ summary.missed }}</strong></div></div>
+            <div class="col-sm-6 col-lg-3"><div class="summary-card"><span>Attendance Percentage</span><strong>{% if summary.percentage is not none %}{{ '%.2f'|format(summary.percentage) }}%{% else %}-{% endif %}</strong></div></div>
+        </div>
+
+        <section class="panel mb-4">
+            <h2 class="h5 mb-3">Add attendance for {{ selected_subject.name }}</h2>
+            <form method="post" action="{{ url_for('add_attendance') }}">
+                <input type="hidden" name="subject_id" value="{{ selected_subject.id }}">
+                <div class="row g-3">
+                    <div class="col-md-3"><label class="form-label" for="record_date">Date</label><input class="form-control" id="record_date" name="record_date" type="date" value="{{ today }}" required></div>
+                    <div class="col-md-3"><label class="form-label" for="status">Status</label><select class="form-select" id="status" name="status" required><option value="Present">Present</option><option value="Absent">Absent</option></select></div>
+                    <div class="col-md-3"><label class="form-label" for="class_type">Class type</label><select class="form-select" id="class_type" name="class_type"><option value="">Not specified</option><option value="Lecture">Lecture</option><option value="Lab">Lab</option></select></div>
+                    <div class="col-md-3"><label class="form-label" for="topic">Topic / description</label><input class="form-control" id="topic" name="topic" type="text" maxlength="255"></div>
+                </div>
+                <button class="btn btn-primary mt-3" type="submit">Add attendance</button>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h2 class="h5 mb-3">Attendance history</h2>
+            {% if records %}
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0"><thead><tr><th>Date</th><th>Status</th><th>Class type</th><th>Topic</th><th>Evidence</th><th class="text-end">Actions</th></tr></thead>
+                    <tbody>{% for record in records %}<tr><td>{{ record.record_date.strftime('%d %b %Y') }}</td><td><span class="attendance-status {{ 'status-good' if record.status == 'Present' else 'status-low' }}">{{ record.status }}</span></td><td>{{ record.class_type or '-' }}</td><td>{{ record.topic or '-' }}</td><td><a href="{{ url_for('add_attendance_evidence', attendance_id=record.id) }}">{{ record.evidence_attachments|length }} attached</a>{% for evidence in record.evidence_attachments %}<br><a class="small" href="{{ url_for('attendance_evidence_detail', attendance_id=record.id, evidence_id=evidence.id) }}">{{ evidence.original_filename }}</a>{% endfor %}</td><td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('edit_attendance', attendance_id=record.id) }}">Edit</a> <form class="d-inline" method="post" action="{{ url_for('delete_attendance', attendance_id=record.id) }}" onsubmit="return confirm('Delete this attendance record?');"><button class="btn btn-sm btn-outline-danger" type="submit">Delete</button></form></td></tr>{% endfor %}</tbody></table>
+                </div>
+            {% else %}
+                <p class="text-secondary mb-0">No attendance records yet</p>
+            {% endif %}
+        </section>
+    {% endif %}
+
+    <section class="panel mt-4">
+        <h2 class="h5 mb-3">Subject-wise attendance summary</h2>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0"><thead><tr><th>Subject</th><th>Total</th><th>Present</th><th>Absent</th><th>Attendance %</th></tr></thead>
+            <tbody>{% for item in summaries %}<tr><td><a href="{{ url_for('attendance', subject_id=item.subject.id) }}">{{ item.subject.name }}</a></td><td>{{ item.summary.total }}</td><td>{{ item.summary.attended }}</td><td>{{ item.summary.missed }}</td><td>{% if item.summary.percentage is not none %}<span class="attendance-status {{ 'status-good' if item.summary.percentage >= 75 else 'status-low' }}">{{ '%.2f'|format(item.summary.percentage) }}%</span>{% else %}<span class="text-secondary">No records</span>{% endif %}</td></tr>{% endfor %}</tbody></table>
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

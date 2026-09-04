@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Add Evidence | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="text-primary fw-semibold mb-1">Evidence attachment</p><h1 class="h2 mb-1">Attach supporting evidence</h1><p class="text-secondary mb-0">Evidence is stored for your record and does not change attendance, marks, or verification status.</p></div></div>
+{% if form_error %}<div class="alert alert-danger" role="alert">{{ form_error }}</div>{% endif %}
+<section class="panel form-panel">
+    <p class="mb-4"><strong>Attached to:</strong> {% if parent_type == 'activity' %}{{ parent.title }}{% elif parent_type == 'assessment' %}{{ parent.assessment_title or parent.assessment_type }}{% else %}{{ parent.record_date.strftime('%d %b %Y') }} attendance record{% endif %}</p>
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3"><label class="form-label" for="evidence_file">Evidence file</label><input class="form-control" id="evidence_file" name="evidence_file" type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" required><div class="form-text">PDF, PNG, JPG, or JPEG. Maximum size: {{ max_size_mb }} MB.</div></div>
+        <div class="mb-3"><label class="form-label" for="description">Description (optional)</label><textarea class="form-control" id="description" name="description" maxlength="255" rows="3"></textarea></div>
+        <div class="alert alert-light border">Verification status: <strong>Pending</strong>. Students cannot mark their own evidence as Verified.</div>
+        <div class="d-flex gap-2"><button class="btn btn-primary" type="submit">Upload evidence</button><a class="btn btn-outline-secondary" href="{% if parent_type == 'activity' %}{{ url_for('activity_detail', activity_id=parent.id) }}{% elif parent_type == 'assessment' %}{{ url_for('assessments') }}{% else %}{{ url_for('attendance', subject_id=parent.subject_id) }}{% endif %}">Cancel</a></div>
+    </form>
+</section>
+{% endblock %}

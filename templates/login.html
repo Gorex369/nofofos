@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Login | Academic Tracker{% endblock %}
+{% block content %}
+<div class="auth-card mx-auto">
+    <h1 class="h3 mb-1">Welcome back</h1>
+    <p class="text-secondary mb-4">Log in to view your academic records.</p>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label" for="email">Email address</label>
+            <input class="form-control" id="email" name="email" type="email" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" id="password" name="password" type="password" required>
+        </div>
+        <button class="btn btn-primary w-100" type="submit">Log in</button>
+    </form>
+    <p class="text-center text-secondary mt-4 mb-0">New student? <a href="{{ url_for('register') }}">Create an account</a></p>
+</div>
+{% endblock %}
