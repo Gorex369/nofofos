@@ -46,6 +46,8 @@ app.config["EVIDENCE_MIME_TYPES"] = {
     ".jpg": ("image/jpeg", b"\xff\xd8\xff"),
     ".jpeg": ("image/jpeg", b"\xff\xd8\xff"),
 }
+os.makedirs(os.path.join(os.path.dirname(__file__), "database"), exist_ok=True)
+
 db.init_app(app)
 os.makedirs(app.config["EVIDENCE_UPLOAD_DIR"], exist_ok=True)
 os.makedirs(app.config["TIMETABLE_UPLOAD_DIR"], exist_ok=True)
