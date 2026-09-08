@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if record else 'Add' }} Assessment | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="text-primary fw-semibold mb-1">Assessment tracking</p>
+        <h1 class="h2 mb-1">{{ 'Edit assessment' if record else 'Add assessment' }}</h1>
+        <p class="text-secondary mb-0">Enter factual marks; performance percentage is calculated automatically.</p>
+    </div>
+</div>
+{% if form_error %}<div class="alert alert-danger" role="alert">{{ form_error }}</div>{% endif %}
+{% if not subjects %}
+    <section class="panel empty-state"><h2 class="h5">Add a subject first</h2><p class="text-secondary mb-3">Assessments must belong to one of your subjects.</p><a class="btn btn-primary" href="{{ url_for('add_subject') }}">Add subject</a></section>
+{% else %}
+<section class="panel form-panel">
+    <form method="post">
+        <div class="row g-3">
+            <div class="col-md-6"><label class="form-label" for="subject_id">Subject <span class="text-danger">*</span></label><select class="form-select" id="subject_id" name="subject_id" required><option value="">Choose a subject</option>{% for subject in subjects %}<option value="{{ subject.id }}" {% if record and record.subject_id == subject.id %}selected{% endif %}>{{ subject.code }} - {{ subject.name }}</option>{% endfor %}</select></div>
+            <div class="col-md-6"><label class="form-label" for="assessment_type">Assessment type <span class="text-danger">*</span></label><select class="form-select" id="assessment_type" name="assessment_type" required><option value="">Choose a type</option>{% for assessment_type in ['Class Test', 'Quiz', 'Assignment', 'Lab', 'Viva', 'Presentation', 'Mid-Term', 'Other'] %}<option value="{{ assessment_type }}" {% if record and record.assessment_type == assessment_type %}selected{% endif %}>{{ assessment_type }}</option>{% endfor %}</select></div>
+            <div class="col-md-8"><label class="form-label" for="assessment_title">Assessment title <span class="text-danger">*</span></label><input class="form-control" id="assessment_title" name="assessment_title" maxlength="120" value="{{ record.assessment_title if record else '' }}" required></div>
+            <div class="col-md-4"><label class="form-label" for="assessment_date">Assessment date <span class="text-danger">*</span></label><input class="form-control" id="assessment_date" name="assessment_date" type="date" value="{{ record.assessment_date.isoformat() if record else today }}" required></div>
+            <div class="col-md-6"><label class="form-label" for="marks_obtained">Marks obtained <span class="text-danger">*</span></label><input class="form-control" id="marks_obtained" name="marks_obtained" type="number" min="0" step="0.01" value="{{ record.marks_obtained if record else '' }}" required></div>
+            <div class="col-md-6"><label class="form-label" for="maximum_marks">Maximum marks <span class="text-danger">*</span></label><input class="form-control" id="maximum_marks" name="maximum_marks" type="number" min="0.01" step="0.01" value="{{ record.maximum_marks if record else '' }}" required></div>
+            <div class="col-12"><label class="form-label" for="remarks">Remarks</label><textarea class="form-control" id="remarks" name="remarks" maxlength="255" rows="3">{{ record.remarks if record else '' }}</textarea></div>
+        </div>
+        <div class="d-flex gap-2 mt-4"><button class="btn btn-primary" type="submit">{{ 'Save changes' if record else 'Add assessment' }}</button><a class="btn btn-outline-secondary" href="{{ url_for('assessments') }}">Cancel</a></div>
+    </form>
+</section>
+{% endif %}
+{% endblock %}

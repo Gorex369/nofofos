@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Activities | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="text-primary fw-semibold mb-1">Academic records</p>
+        <h1 class="h2 mb-1">Activities</h1>
+        <p class="text-secondary mb-0">Keep academic and extra-curricular activities separate from class attendance.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('add_activity') }}">Add activity</a>
+</div>
+<section class="panel mb-4">
+    <form method="get" class="row align-items-end g-3">
+        <div class="col-md-4">
+            <label class="form-label" for="subject_id">Subject</label>
+            <select class="form-select" id="subject_id" name="subject_id"><option value="">All subjects</option>{% for subject in subjects %}<option value="{{ subject.id }}" {% if selected_subject_id == subject.id %}selected{% endif %}>{{ subject.code }} - {{ subject.name }}</option>{% endfor %}</select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="category">Category</label>
+            <select class="form-select" id="category" name="category"><option value="">All categories</option>{% for category in categories %}<option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>{% endfor %}</select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="activity_type">Activity type</label>
+            <select class="form-select" id="activity_type" name="activity_type"><option value="">All types</option>{% for activity_type in activity_types %}<option value="{{ activity_type }}" {% if selected_activity_type == activity_type %}selected{% endif %}>{{ activity_type }}</option>{% endfor %}</select>
+        </div>
+        <div class="col-md-2"><button class="btn btn-outline-primary w-100" type="submit">Filter</button></div>
+    </form>
+</section>
+<section class="panel">
+    {% if activities %}
+        <div class="table-responsive">
+            <table class="table align-middle mb-0"><thead><tr><th>Date</th><th>Activity</th><th>Category</th><th>Type</th><th>Subject</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>{% for activity in activities %}<tr><td>{{ activity.activity_date.strftime('%d %b %Y') }}</td><td><a class="fw-semibold" href="{{ url_for('activity_detail', activity_id=activity.id) }}">{{ activity.title }}</a></td><td>{{ activity.activity_category }}</td><td>{{ activity.activity_type }}</td><td>{{ activity.subject.code if activity.subject else '-' }}</td><td><span class="activity-status status-{{ activity.verification_status|lower }}">{{ activity.verification_status }}</span></td><td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('edit_activity', activity_id=activity.id) }}">Edit</a> <form class="d-inline" method="post" action="{{ url_for('delete_activity', activity_id=activity.id) }}" onsubmit="return confirm('Delete this activity?');"><button class="btn btn-sm btn-outline-danger" type="submit">Delete</button></form></td></tr>{% endfor %}</tbody></table>
+        </div>
+    {% else %}
+        <div class="empty-state"><h2 class="h5">No activities found</h2><p class="text-secondary mb-3">Record an academic or extra-curricular activity to see it here.</p><a class="btn btn-primary" href="{{ url_for('add_activity') }}">Add activity</a></div>
+    {% endif %}
+</section>
+{% endblock %}

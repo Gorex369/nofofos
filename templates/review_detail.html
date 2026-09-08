@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Review Details | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="text-primary fw-semibold mb-1">Assessment review</p><h1 class="h2 mb-1">Review details</h1><p class="text-secondary mb-0">A factual comparison of recorded and reviewed marks.</p></div><div class="d-flex gap-2"><a class="btn btn-outline-primary" href="{{ url_for('edit_review', review_id=review.id) }}">Edit review</a><a class="btn btn-outline-secondary" href="{{ url_for('reviews') }}">All reviews</a></div></div>
+<section class="panel detail-panel">
+    <h2 class="h5">{{ review.assessment.assessment_title or review.assessment.assessment_type }}</h2>
+    <p class="text-secondary">{{ review.assessment.subject.code }} - {{ review.assessment.subject.name }}</p>
+    <dl class="row mb-4"><dt class="col-sm-5">Original assessment</dt><dd class="col-sm-7">{{ '%.2f'|format(review.assessment.marks_obtained) }} / {{ '%.2f'|format(review.assessment.maximum_marks) }}</dd><dt class="col-sm-5">Recorded marks at review</dt><dd class="col-sm-7">{{ '%.2f'|format(review.recorded_marks_obtained) }}</dd><dt class="col-sm-5">Reviewed / compared marks</dt><dd class="col-sm-7">{{ '%.2f'|format(review.reviewed_marks_obtained) }}</dd><dt class="col-sm-5">Difference</dt><dd class="col-sm-7">{% if review.difference > 0 %}+{% endif %}{{ '%.2f'|format(review.difference) }}</dd><dt class="col-sm-5">Status</dt><dd class="col-sm-7"><span class="review-status review-{{ review.review_status|lower|replace(' ', '-') }}">{{ review.review_status }}</span></dd><dt class="col-sm-5">Created</dt><dd class="col-sm-7">{{ review.created_at.strftime('%d %b %Y, %H:%M') }}</dd></dl>
+    <h2 class="h5">Review note</h2><p class="activity-description">{{ review.review_note or 'No review note provided.' }}</p>
+    <hr>
+    <h2 class="h5">Existing assessment evidence</h2>
+    {% if evidence %}<ul>{% for attachment in evidence %}<li><a href="{{ url_for('assessment_evidence_detail', assessment_id=review.assessment_id, evidence_id=attachment.id) }}">{{ attachment.original_filename }}</a> <span class="text-secondary">({{ attachment.verification_status }})</span></li>{% endfor %}</ul>{% else %}<p class="text-secondary">No evidence attached to this assessment.</p>{% endif %}
+    <form class="border-top mt-4 pt-4" method="post" action="{{ url_for('delete_review', review_id=review.id) }}" onsubmit="return confirm('Delete this review?');"><button class="btn btn-outline-danger" type="submit">Delete review</button></form>
+</section>
+{% endblock %}

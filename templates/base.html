@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b0b0f">
+    <title>{% block title %}NOFOFOS{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %} {% if session.get('user_id') %}authenticated-page{% else %}public-page{% endif %}">
+    {% if session.get('user_id') %}
+    <div class="app-shell">
+        <header class="mobile-topbar">
+            <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">N</span><span>NOFOFOS</span></a>
+            <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-nav-toggle>Menu</button>
+        </header>
+        <aside class="sidebar" data-sidebar>
+            <div class="sidebar-head">
+                <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">N</span><span>NOFOFOS</span></a>
+                <span class="system-tag">ACADEMIC SYSTEM · 2026</span>
+            </div>
+            <div class="workspace-label">{{ session.get('user_role','student')|upper }} WORKSPACE</div>
+            <nav class="app-nav" aria-label="Primary navigation">
+                {% if session.get('user_role') == 'student' %}
+                <a class="{{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}"><span>01</span>Overview</a>
+                <a class="{{ 'active' if request.endpoint in ('subjects', 'add_subject', 'edit_subject') else '' }}" href="{{ url_for('subjects') }}"><span>02</span>Subjects</a>
+                <a class="{{ 'active' if request.endpoint in ('attendance', 'add_attendance', 'edit_attendance') else '' }}" href="{{ url_for('attendance') }}"><span>03</span>Attendance</a>
+                <a class="{{ 'active' if request.endpoint in ('assessments', 'add_assessment', 'edit_assessment') else '' }}" href="{{ url_for('assessments') }}"><span>04</span>Assessments</a>
+                <a class="{{ 'active' if request.endpoint in ('activities', 'add_activity', 'edit_activity', 'activity_detail') else '' }}" href="{{ url_for('activities') }}"><span>05</span>Activities</a>
+                <a class="{{ 'active' if request.endpoint in ('reviews', 'review_detail', 'edit_review', 'create_assessment_review') else '' }}" href="{{ url_for('reviews') }}"><span>06</span>Reviews</a>
+                <a class="{{ 'active' if request.endpoint == 'student_timetable' else '' }}" href="{{ url_for('student_timetable') }}"><span>07</span>Timetable</a>
+                {% elif session.get('user_role') == 'faculty' %}
+                <a class="{{ 'active' if request.endpoint == 'faculty_dashboard' else '' }}" href="{{ url_for('faculty_dashboard') }}"><span>01</span>Overview</a>
+                <a class="{{ 'active' if request.endpoint == 'faculty_activities' else '' }}" href="{{ url_for('faculty_activities') }}"><span>02</span>Verified activities</a>
+                <a class="{{ 'active' if request.endpoint in ('manage_timetables','manage_timetable_detail') else '' }}" href="{{ url_for('manage_timetables') }}"><span>03</span>Draft timetables</a>
+                {% elif session.get('user_role') == 'coordinator' %}
+                <a class="{{ 'active' if request.endpoint == 'coordinator_dashboard' else '' }}" href="{{ url_for('coordinator_dashboard') }}"><span>01</span>Overview</a>
+                <a class="{{ 'active' if request.endpoint in ('coordinator_activities','coordinator_activity_detail','coordinator_evidence_detail') else '' }}" href="{{ url_for('coordinator_activities') }}"><span>02</span>Activity verification</a>
+                <a class="{{ 'active' if request.endpoint in ('manage_timetables','manage_timetable_detail') else '' }}" href="{{ url_for('manage_timetables') }}"><span>03</span>Manage timetables</a>
+                {% elif session.get('user_role') == 'admin' %}
+                <a class="{{ 'active' if request.endpoint == 'admin_dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}"><span>01</span>Overview</a>
+                <a class="{{ 'active' if request.endpoint in ('manage_timetables','manage_timetable_detail') else '' }}" href="{{ url_for('manage_timetables') }}"><span>02</span>Manage timetables</a>
+                {% endif %}
+            </nav>
+            <div class="sidebar-footer">
+                {% if session.get('user_role') == 'student' %}<a href="{{ url_for('profile') }}"><span>↳</span>Profile</a>{% endif %}
+                <a class="logout-link" href="{{ url_for('logout') }}"><span>×</span>Log out</a>
+            </div>
+        </aside>
+        <main class="app-main">
+            <div class="app-topline"><span>NOFOFOS / {{ session.get('user_role','student')|capitalize }}</span><span>ACADEMIC RECORD SYSTEM</span></div>
+    {% else %}
+        <header class="public-topbar">
+            <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">N</span><span>NOFOFOS</span></a>
+            <nav class="public-nav" aria-label="Public navigation"><a href="{{ url_for('home') }}#features">Capabilities</a><a href="{{ url_for('home') }}#workflow">How it works</a></nav>
+            <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Access NOFOFOS</a>
+        </header>
+        <main class="public-main">
+    {% endif %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    {% if session.get('user_id') %}</div>{% endif %}
+    <script src="{{ url_for('static', filename='js/app-shell.js') }}"></script>
+</body>
+</html>

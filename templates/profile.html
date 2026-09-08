@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Profile | Academic Tracker{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="text-primary fw-semibold mb-1">Student profile</p>
+        <h1 class="h2 mb-1">Your profile</h1>
+        <p class="text-secondary mb-0">Keep your academic identity details up to date.</p>
+    </div>
+</div>
+<section class="panel profile-panel">
+    <form method="post">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label" for="full_name">Full name</label>
+                <input class="form-control" id="full_name" name="full_name" value="{{ user.full_name }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="student_id">Student ID / enrollment number</label>
+                <input class="form-control" id="student_id" name="student_id" value="{{ user.student_id }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" id="email" value="{{ user.email }}" readonly>
+                <div class="form-text">Email cannot be changed here.</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="branch">Branch</label>
+                <input class="form-control" id="branch" name="branch" value="{{ user.branch or '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="semester">Semester</label>
+                <input class="form-control" id="semester" name="semester" value="{{ user.semester or '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="section">Section</label>
+                <input class="form-control" id="section" name="section" value="{{ user.section or '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="academic_year">Academic year</label>
+                <input class="form-control" id="academic_year" name="academic_year" value="{{ user.academic_year or '' }}" placeholder="e.g. 2026-27">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="batch_group">Batch / group</label>
+                <input class="form-control" id="batch_group" name="batch_group" value="{{ user.batch_group or '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="academic_year">Academic year</label>
+                <input class="form-control" id="academic_year" name="academic_year" value="{{ user.academic_year or '' }}" placeholder="e.g. 2026-27">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="batch_group">Batch / group</label>
+                <input class="form-control" id="batch_group" name="batch_group" value="{{ user.batch_group or '' }}" placeholder="Optional">
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Save profile</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('dashboard') }}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
